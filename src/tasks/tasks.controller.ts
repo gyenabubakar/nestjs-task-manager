@@ -1,7 +1,7 @@
-import { Body, Controller, Delete, Get, HttpCode, Param, Post, Res } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post, Res } from '@nestjs/common';
 import type { Response } from 'express';
 import { TasksService } from './tasks.service';
-import { Task } from './task.model';
+import { Task, TaskStatus } from './task.model';
 import CreateTaskDto from './dto/create-task.dto';
 
 @Controller('tasks')
@@ -31,9 +31,23 @@ export class TasksController {
   @Delete(':id')
   @HttpCode(204)
   deleteOneTask(@Param('id') id: string, @Res({ passthrough: true }) response: Response) {
-    const removed = this.tasksService.removeTaskById(id);
-    if (!removed) {
+    const isRemoved = this.tasksService.removeTaskById(id);
+    if (!isRemoved) {
       response.status(404).send({ message: `No task with the ID (${id}) was found.` });
     }
+  }
+
+  @Patch(':id/status')
+  updateTaskStatus(
+    @Param('id') id: string,
+    @Body('status') status: TaskStatus,
+    @Res({ passthrough: true }) response: Response,
+  ): Task | void {
+    const updatedTask = this.tasksService.changeTaskStatus(id, status);
+    if (!updatedTask) {
+      response.status(404).send({ message: `No task with the ID (${id}) was found.` });
+      return;
+    }
+    return updatedTask;
   }
 }

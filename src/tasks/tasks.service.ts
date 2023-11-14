@@ -52,6 +52,7 @@ export class TasksService {
     tasks.splice(index, 1, {
       ...tasks[index],
       status,
+      updatedAt: Date.now(),
     });
     this.tasks = tasks;
 
