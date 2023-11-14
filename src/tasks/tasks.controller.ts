@@ -19,7 +19,7 @@ export class TasksController {
   }
 
   @Get(':id')
-  getOneTask(@Param('id') id: string, @Res({ passthrough: true }) response: Response): Task {
+  getOneTask(@Param('id') id: string, @Res({ passthrough: true }) response: Response): Task | void {
     const task = this.tasksService.findTaskById(id);
     if (!task) {
       response.status(404).send({ message: `No task with the ID (${id}) was found.` });
